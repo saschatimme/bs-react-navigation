@@ -116,7 +116,7 @@ module StackNavigator = {
     type screenBag 'screenProps 'style = {
       navigation: Navigation.t,
       screenProps: 'screenProps,
-      navigationOptions: navigationOptionsRecord 'style
+      navigationOptions: option (navigationOptionsRecord 'style)
     };
   };
 
@@ -277,8 +277,8 @@ module StackNavigator = {
     Js.t {
       .
       navigation : Navigation.t,
-      screenProps : Js.t {. mlScreenProps : 'screenProps},
-      navigationOptions : navigationOptions 'style
+      screenProps :'screenProps,
+      navigationOptions : Js.Undefined.t (navigationOptions 'style)
     };
 
   /** We will make this type abstract */
@@ -290,8 +290,7 @@ module StackNavigator = {
       navigationOptions : Js.Undefined.t externalNavigationOptions
     };
   type dynamicNavigationOptions 'screenProps 'style =
-    Component.screenBag 'screenProps 'style =>
-    navigationOptions 'style;
+    Component.screenBag 'screenProps 'style => navigationOptions 'style;
   let routeConfig
       screen::(screen: Component.screenBag 'screenProps 'style => ReactRe.reactElement)
       path::(path: option string)=?
@@ -304,9 +303,9 @@ module StackNavigator = {
       Js.log "screen";
       Js.log jsItems;
       let navigation = jsItems##navigation;
-      let screenProps = jsItems##screenProps##mlScreenProps;
-      let navigationOptions = navOptionsFromJs jsItems##navigationOptions;
-      screen (screenBag navigation screenProps navigationOptions);
+      let screenProps = jsItems##screenProps;
+      let navigationOptions = option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions);
+      screen (screenBag navigation screenProps navigationOptions)
       /*screen (screenBag jsItems##navigation jsItems##screenProps##mlScreenProps),*/
     },
     "path": Js.Undefined.from_opt path,
@@ -316,8 +315,12 @@ module StackNavigator = {
         Obj.magic (
           Js.Undefined.return (
             fun jsItems =>
-              dynNavOps
-                (screenBag jsItems##navigation jsItems##screenProps (navOptionsFromJs jsItems##navigationOptions))
+              dynNavOps (
+                screenBag
+                  jsItems##navigation
+                  jsItems##screenProps
+                  (option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions))
+              )
           )
         )
       | None => Obj.magic (Js.Undefined.from_opt navigationOptions)
@@ -326,22 +329,26 @@ module StackNavigator = {
 
   /** We will make this type abstract */
   type routesConfig 'screenProps 'style = Js.Dict.t (routeConfig 'screenProps 'style);
-  let routesConfig (routeList: list (string, routeConfig 'screenProps 'style )) :routesConfig 'screenProps 'style =>
+  let routesConfig
+      (routeList: list (string, routeConfig 'screenProps 'style))
+      :routesConfig 'screenProps 'style =>
     dictFromList routeList;
 
   /** Our interface */
   module type StackNavigatorSpec = {
-    type props;
+    type screenProps;
     type style;
-    let routes: routesConfig props style;
+    let routes: routesConfig screenProps style;
     let config: option (config style);
   };
   module CreateComponent (Spec: StackNavigatorSpec) => {
     external _createElement :
-      routesConfig Spec.props Spec.style => Js.Undefined.t (config Spec.style) => ReactRe.reactClass =
+      routesConfig Spec.screenProps Spec.style =>
+      Js.Undefined.t (config Spec.style) =>
+      ReactRe.reactClass =
       "StackNavigator" [@@bs.module "react-navigation"];
-    let wrapProps props =>
+    let wrapProps (screenProps: Spec.screenProps) =>
       ReactRe.wrapPropsShamelessly
-        (_createElement Spec.routes (Js.Undefined.from_opt Spec.config)) {"mlScreenProps": props};
+        (_createElement Spec.routes (Js.Undefined.from_opt Spec.config)) {"screenProps": screenProps};
   };
 };

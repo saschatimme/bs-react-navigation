@@ -57,7 +57,7 @@ module StackNavigator: {
     type screenBag 'screenProps 'style = {
       navigation: Navigation.t,
       screenProps: 'screenProps,
-      navigationOptions: navigationOptionsRecord 'style
+      navigationOptions: option (navigationOptionsRecord 'style)
     };
   };
   type navigationOptions 'style;
@@ -96,26 +96,23 @@ module StackNavigator: {
     screen::(Component.screenBag 'screenProps 'style => ReactRe.reactElement) =>
     path::string? =>
     navigationOptions::navigationOptions 'style? =>
-    dynamicNavigationOptions::
-      (
-        Component.screenBag 'screenProps 'style =>
-        navigationOptions 'style
-      )? =>
+    dynamicNavigationOptions::(Component.screenBag 'screenProps 'style => navigationOptions 'style)? =>
     unit =>
     routeConfig 'screenProps 'style;
   type routesConfig 'screenProps 'style;
-  let routesConfig: list (string, routeConfig 'screenProps 'style) => routesConfig 'screenProps 'style;
+  let routesConfig:
+    list (string, routeConfig 'screenProps 'style) => routesConfig 'screenProps 'style;
   module type StackNavigatorSpec = {
-    type props;
+    type screenProps;
     type style;
-    let routes: routesConfig props style;
+    let routes: routesConfig screenProps style;
     let config: option (config style);
   };
   module CreateComponent:
     (Spec: StackNavigatorSpec) =>
     {
       let wrapProps:
-        'a =>
+        Spec.screenProps =>
         children::list ReactRe.reactElement =>
         ref::(ReactRe.reactRef => unit)? =>
         key::string? =>
