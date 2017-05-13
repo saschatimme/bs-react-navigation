@@ -1,0 +1,31 @@
+{
+  "name": "RNPlayground",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "bsb -clean-world -make-world",
+    "packager:start": "node node_modules/react-native/local-cli/cli.js start",
+    "copy:nav": "node copy.js",
+    "watch:bsb": "bsb -w",
+    "watch:nav": "node watch.js",
+    "start": "node copy.js && npm run build && npm run packager:start"
+  },
+  "dependencies": {
+    "react": "16.0.0-alpha.6",
+    "react-native": "0.44.0",
+    "reason-react": "^0.1.3",
+    "react-navigation": "^1.0.0-beta.9",
+    "bs-react-native": "https://github.com/BuckleTypes/bs-react-native"
+  },
+  "devDependencies": {
+    "babel-jest": "20.0.1",
+    "babel-preset-react-native": "1.9.2",
+    "bs-platform": "^1.7.3",
+    "chokidar": "^1.7.0",
+    "jest": "20.0.1",
+    "react-test-renderer": "16.0.0-alpha.6"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "bs-react-navigation",
+    "reason": {
+        "react-jsx": true
+    },
+    "bs-dependencies": ["reason-react"],
+    "sources": [{
+        "dir": "re"
+    }]
+}

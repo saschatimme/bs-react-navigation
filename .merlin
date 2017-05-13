@@ -1,0 +1,11 @@
+####{BSB GENERATED: NO EDIT
+FLG -ppx /Users/sascha/coding/private/bs-react-navigation/node_modules/bs-platform/bin/reactjs_jsx_ppx.exe
+FLG -ppx /Users/sascha/coding/private/bs-react-navigation/node_modules/bs-platform/bin/bsppx.exe
+S /Users/sascha/coding/private/bs-react-navigation/node_modules/bs-platform/lib/ocaml
+B /Users/sascha/coding/private/bs-react-navigation/node_modules/bs-platform/lib/ocaml
+FLG -nostdlib -no-alias-deps -color always -w -40+6+7+27+32..39+44+45
+S /Users/sascha/coding/private/bs-react-navigation/node_modules/reason-react/lib/ocaml
+B /Users/sascha/coding/private/bs-react-navigation/node_modules/reason-react/lib/ocaml
+S re
+B lib/bs/re
+####BSB GENERATED: NO EDIT}

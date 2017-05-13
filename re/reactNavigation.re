@@ -1,6 +1,5 @@
 type headerProps;
 
-/*type 'style;*/
 let option_map fn opt_value =>
   switch opt_value {
   | None => None
