@@ -23,7 +23,7 @@ function copyReactNavigation() {
         "navigationRe.re",
         "stackNavigatorRe.re",
         "tabNavigatorRe.re",
-        "utils.re"
+        "navUtils.re"
     ];
 
     fileNames.forEach (name => {

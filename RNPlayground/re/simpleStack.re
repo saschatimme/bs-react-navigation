@@ -4,8 +4,7 @@ open ReactNavigation;
 
 module SimpleStack = {
   include StackNavigator.Component;
-  type screenProps = {test: string};
-  type style = ReactNative.Style.t;
+  type screenProps = unit;
   let params name::(name: string) => {
     let dict = Js.Dict.empty ();
     Js.Dict.set dict "name" name;
@@ -116,4 +115,4 @@ module SimpleStack = {
 
 include StackNavigator.CreateComponent SimpleStack;
 
-let createElement ::test => wrapProps {test: test};
+let createElement = wrapProps ();

@@ -4,9 +4,9 @@ module App = {
   type props = unit;
   type jsProps = option (unit => unit);
   let jsPropsToReasonProps = Some (fun _ => ());
-  let render _ => <SimpleStack test="hello"/>;
+  let render _ => <AppNavigator />;
 };
-
+ 
 include ReactRe.CreateComponent App;
 
 let createElement = wrapProps ();
