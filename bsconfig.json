@@ -3,7 +3,7 @@
     "reason": {
         "react-jsx": true
     },
-    "bs-dependencies": ["reason-react"],
+    "bs-dependencies": ["bs-react-native", "reason-react"],
     "sources": [{
         "dir": "re"
     }]

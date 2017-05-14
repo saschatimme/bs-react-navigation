@@ -1,10 +1,12 @@
+type style = ReactNative.Style.t;
+
 module Component = {
   type navigationOptionsRecord = {
     title: option string,
-    tabBarVisible: option bool,
+    tabBarVisible: option bool
     /*
-    tabBarIcon: option (focused::bool => tintColor::string => ReactRe.reactElement),
-    tabBarLabel: option (focused::bool => tintColor::string => ReactRe.reactElement)*/
+     tabBarIcon: option (focused::bool => tintColor::string => ReactRe.reactElement),
+     tabBarLabel: option (focused::bool => tintColor::string => ReactRe.reactElement)*/
   };
   type screenBag 'screenProps = {
     navigation: NavigationRe.t,
@@ -24,12 +26,16 @@ type navigationOptions =
       Js.Undefined.t (Js.t {. focused : Js.boolean, tintColor : string} => ReactRe.reactElement)
   };
 
+type tabBarElement = [
+  | `static ReactRe.reactElement
+  | `dynamic (focused::bool => tintColor::string => ReactRe.reactElement)
+];
+
 let navigationOptions
     title::(title: option string)=?
     tabBarVisible::(tabBarVisible: option bool)=?
-    tabBarIcon::(tabBarIcon: option (focused::bool => tintColor::string => ReactRe.reactElement))=?
-    tabBarLabel::
-      (tabBarLabel: option (focused::bool => tintColor::string => ReactRe.reactElement))=?
+    tabBarIcon::(tabBarIcon: option tabBarElement)=?
+    tabBarLabel::(tabBarLabel: option tabBarElement)=?
     ()
     :navigationOptions =>
   Js.Undefined.(
@@ -39,12 +45,30 @@ let navigationOptions
       "tabBarIcon":
         from_opt (
           Utils.option_map
-            (fun f js => f focused::(Js.to_bool js##focused) tintColor::js##tintColor) tabBarIcon
+            (
+              fun p =>
+                switch p {
+                | `static el => Obj.magic el
+                | `dynamic f => (
+                    fun js => f focused::(Js.to_bool js##focused) tintColor::js##tintColor
+                  )
+                }
+            )
+            tabBarIcon
         ),
       "tabBarLabel":
         from_opt (
           Utils.option_map
-            (fun f js => f focused::(Js.to_bool js##focused) tintColor::js##tintColor) tabBarLabel
+            (
+              fun p =>
+                switch p {
+                | `static el => Obj.magic el
+                | `dynamic f => (
+                    fun js => f focused::(Js.to_bool js##focused) tintColor::js##tintColor
+                  )
+                }
+            )
+            tabBarLabel
         )
     }
   );
@@ -53,16 +77,16 @@ let navigationOptionsFromJs (jsItem: navigationOptions) :Component.navigationOpt
   Component.(
     Js.Undefined.{
       title: to_opt jsItem##title,
-      tabBarVisible: Utils.option_map Js.to_bool (to_opt jsItem##tabBarVisible),
+      tabBarVisible: Utils.option_map Js.to_bool (to_opt jsItem##tabBarVisible)
       /** there is no value to provide these values */
       /*tabBarIcon: None,
-      tabBarLabel: None*/
+        tabBarLabel: None*/
     }
   );
 
 
 /** We will make this type abstract */
-type tabBarOptions 'style =
+type tabBarOptions =
   Js.t {
     .
     /**
@@ -73,8 +97,8 @@ type tabBarOptions 'style =
     inactiveTintColor : Js.Undefined.t string,
     inactiveBackgroundColor : Js.Undefined.t string,
     showLabel : Js.Undefined.t Js.boolean,
-    style : Js.Undefined.t 'style,
-    labelStyle : Js.Undefined.t 'style,
+    style : Js.Undefined.t style,
+    labelStyle : Js.Undefined.t style,
     /**
      *  TabBarBottom
      **/
@@ -85,11 +109,11 @@ type tabBarOptions 'style =
     pressColor : Js.Undefined.t Js.boolean,
     pressOpacity : Js.Undefined.t float,
     scrollEnabled : Js.Undefined.t Js.boolean,
-    tabStyle : Js.Undefined.t 'style,
-    indicatorStyle : Js.Undefined.t 'style,
-    /*style: Js.Undefined.t 'style,
-      labelStyle: Js.Undefined.t 'style,*/
-    iconStyle : Js.Undefined.t 'style
+    tabStyle : Js.Undefined.t style,
+    indicatorStyle : Js.Undefined.t style,
+    /*style: Js.Undefined.t style,
+      labelStyle: Js.Undefined.t style,*/
+    iconStyle : Js.Undefined.t style
   };
 
 let tabBarOptions
@@ -109,7 +133,7 @@ let tabBarOptions
     ::indicatorStyle=?
     ::iconStyle=?
     ()
-    :tabBarOptions 'style =>
+    :tabBarOptions =>
   Js.Undefined.(
     {
       "activeTintColor": from_opt activeTintColor,
@@ -132,7 +156,7 @@ let tabBarOptions
 
 
 /** We will make this type abstract */
-type config 'style =
+type config =
   Js.t {
     .
     /*router*/
@@ -146,7 +170,7 @@ type config 'style =
     swipeEnabled : Js.Undefined.t Js.boolean,
     animationEnabled : Js.Undefined.t Js.boolean,
     _lazy : Js.Undefined.t Js.boolean,
-    tabBarOptions : Js.Undefined.t (tabBarOptions 'style)
+    tabBarOptions : Js.Undefined.t tabBarOptions
   };
 
 let config
@@ -161,7 +185,7 @@ let config
     ::paths=?
     ::tabBarComponent=?
     ()
-    :config 'style =>
+    :config =>
   Js.Undefined.(
     {
       "initialRouteName": from_opt initialRouteName,
@@ -272,14 +296,13 @@ let routesConfig (routeList: list (string, routeConfig 'screenProps)) :routesCon
 /** Our interface */
 module type TabNavigatorSpec = {
   type screenProps;
-  type style;
   let routes: routesConfig screenProps;
-  let config: option (config 'style);
+  let config: option config;
 };
 
 module CreateComponent (Spec: TabNavigatorSpec) => {
   external _createElement :
-    routesConfig Spec.screenProps => Js.Undefined.t (config Spec.style) => ReactRe.reactClass =
+    routesConfig Spec.screenProps => Js.Undefined.t config => ReactRe.reactClass =
     "StackNavigator" [@@bs.module "react-navigation"];
   let wrapProps (screenProps: Spec.screenProps) =>
     ReactRe.wrapPropsShamelessly

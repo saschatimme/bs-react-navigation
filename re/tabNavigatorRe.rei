@@ -1,3 +1,5 @@
+type style = ReactNative.Style.t;
+
 module Component: {
   type navigationOptionsRecord = {title: option string, tabBarVisible: option bool};
   type screenBag 'screenProps = {
@@ -12,13 +14,20 @@ type navigationOptions;
 let navigationOptions:
   title::string? =>
   tabBarVisible::bool? =>
-  tabBarIcon::(focused::bool => tintColor::string => ReactRe.reactElement)? =>
-  tabBarLabel::(focused::bool => tintColor::string => ReactRe.reactElement)? =>
+  tabBarIcon::
+    [
+      | `static ReactRe.reactElement
+      | `dynamic (focused::bool => tintColor::string => ReactRe.reactElement)
+    ]? =>
+  tabBarLabel::
+    [
+      | `static ReactRe.reactElement
+      | `dynamic (focused::bool => tintColor::string => ReactRe.reactElement)
+    ]? =>
   unit =>
   navigationOptions;
 
-
-type tabBarOptions 'style;
+type tabBarOptions;
 
 let tabBarOptions:
   activeTintColor::string? =>
@@ -26,23 +35,23 @@ let tabBarOptions:
   inactiveTintColor::string? =>
   inactiveBackgroundColor::string? =>
   showLabel::bool? =>
-  style::'style? =>
-  labelStyle::'style? =>
+  style::style? =>
+  labelStyle::style? =>
   showIcon::bool? =>
   upperCaseLabel::bool? =>
   pressColor::bool? =>
   pressOpacity::float? =>
   scrollEnabled::bool? =>
-  tabStyle::'style? =>
-  indicatorStyle::'style? =>
-  iconStyle::'style? =>
+  tabStyle::style? =>
+  indicatorStyle::style? =>
+  iconStyle::style? =>
   unit =>
-  tabBarOptions 'style;
+  tabBarOptions;
 
-type config 'style;
+type config;
 
 let config:
-  tabBarOptions::tabBarOptions 'style? =>
+  tabBarOptions::tabBarOptions? =>
   animationEnabled::bool? =>
   backBehavior::[< | `initialRoute | `none]? =>
   lazy_::bool? =>
@@ -53,9 +62,7 @@ let config:
   paths::Js.Dict.t string? =>
   tabBarComponent::ReactRe.reactClass? =>
   unit =>
-  config 'style;
-
-
+  config;
 
 type routeConfig 'screenProps;
 
@@ -63,7 +70,7 @@ let routeConfig:
   screen::(Component.screenBag 'screenProps => ReactRe.reactElement) =>
   path::string? =>
   navigationOptions::navigationOptions? =>
-  dynamicNavigationOptions::( Component.screenBag 'screenProps => navigationOptions)? =>
+  dynamicNavigationOptions::(Component.screenBag 'screenProps => navigationOptions)? =>
   unit =>
   routeConfig 'screenProps;
 
@@ -73,9 +80,8 @@ let routesConfig: list (string, routeConfig 'screenProps) => routesConfig 'scree
 
 module type TabNavigatorSpec = {
   type screenProps;
-  type style;
   let routes: routesConfig screenProps;
-  let config: option (config 'style);
+  let config: option config;
 };
 
 module CreateComponent:
@@ -89,4 +95,3 @@ module CreateComponent:
       unit =>
       ReactRe.reactElement;
   };
-

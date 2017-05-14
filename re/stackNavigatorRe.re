@@ -1,50 +1,52 @@
 type headerProps /* TODO */;
 
+type style = ReactNative.Style.t;
+
 module Component = {
-  type navigationOptionsRecord 'style = {
+  type navigationOptionsRecord = {
     title: option string,
     header: option (headerProps => ReactRe.reactElement),
     headerVisible: option bool,
     headerTitle: option ReactRe.reactElement,
-    headerTitleStyle: option 'style,
+    headerTitleStyle: option style,
     headerTintColor: option string,
     headerBackTitle: option string,
     headerTruncatedBackTitle: option string,
     headerLeft: option ReactRe.reactElement,
-    headerBackTitleStyle: option 'style,
+    headerBackTitleStyle: option style,
     headerPressColorAndroid: option string,
     headerRight: option ReactRe.reactElement,
-    headerStyle: option 'style,
+    headerStyle: option style,
     gesturesEnabled: option bool
   };
-  type screenBag 'screenProps 'style = {
+  type screenBag 'screenProps = {
     navigation: NavigationRe.t,
     screenProps: 'screenProps,
-    navigationOptions: option (navigationOptionsRecord 'style)
+    navigationOptions: option navigationOptionsRecord
   };
 };
 
 
 /** We will make this type abstract */
-type navigationOptions 'style =
+type navigationOptions =
   Js.t {
     .
     title : Js.Undefined.t string,
     header : Js.Null_undefined.t (headerProps => ReactRe.reactElement),
     headerTitle : Js.Undefined.t ReactRe.reactElement,
-    headerTitleStyle : Js.Undefined.t 'style,
+    headerTitleStyle : Js.Undefined.t style,
     headerTintColor : Js.Undefined.t string,
     headerBackTitle : Js.Undefined.t string,
     headerTruncatedBackTitle : Js.Undefined.t string,
     headerLeft : Js.Undefined.t ReactRe.reactElement,
-    headerBackTitleStyle : Js.Undefined.t 'style,
+    headerBackTitleStyle : Js.Undefined.t style,
     headerPressColorAndroid : Js.Undefined.t string,
     headerRight : Js.Undefined.t ReactRe.reactElement,
-    headerStyle : Js.Undefined.t 'style,
+    headerStyle : Js.Undefined.t style,
     gesturesEnabled : Js.Undefined.t Js.boolean
   };
 
-let navOptionsFromJs jsItem :Component.navigationOptionsRecord 'style =>
+let navOptionsFromJs jsItem :Component.navigationOptionsRecord =>
   Component.(
     Js.Undefined.{
       title: to_opt jsItem##title,
@@ -80,7 +82,7 @@ let navigationOptions
     ::headerStyle=?
     ::gesturesEnabled=?
     () => {
-  let x: navigationOptions 'style =
+  let x: navigationOptions =
     Js.Undefined.(
       {
         "title": from_opt title,
@@ -108,18 +110,18 @@ let navigationOptions
 
 
 /** We will make this type abstract */
-type config 'style =
+type config =
   Js.t {
     .
     /*router*/
     initialRouteName : Js.Undefined.t string,
     initialRouteParams : Js.Dict.t string,
     paths : Js.Undefined.t (Js.Dict.t string),
-    navigationOptions : Js.Undefined.t (navigationOptions 'style),
+    navigationOptions : Js.Undefined.t navigationOptions,
     /*view*/
     mode : Js.Undefined.t string,
     headerMode : Js.Undefined.t string,
-    cardStyle : Js.Undefined.t 'style,
+    cardStyle : Js.Undefined.t style,
     /*TODO transitionConfig*/
     onTransitionStart : Js.Undefined.t (unit => unit),
     onTransitionEnd : Js.Undefined.t (unit => unit)
@@ -136,7 +138,7 @@ let config
     ::onTransitionStart=?
     ::onTransitionEnd=?
     ()
-    :config 'style =>
+    :config =>
   Js.Undefined.(
     {
       "initialRouteName": from_opt initialRouteName,
@@ -180,41 +182,40 @@ let config
 
 type externalNavigationOptions;
 
-let screenBag navigation screenProps navigationOptions :Component.screenBag 'screenProps 'style =>
+let screenBag navigation screenProps navigationOptions :Component.screenBag 'screenProps =>
   Component.{navigation, screenProps, navigationOptions};
 
 
 /** We will make this type abstract */
-type screenBagJs 'screenProps 'style =
+type screenBagJs 'screenProps =
   Js.t {
     .
     navigation : NavigationRe.t,
     screenProps : 'screenProps,
-    navigationOptions : Js.Undefined.t (navigationOptions 'style)
+    navigationOptions : Js.Undefined.t navigationOptions
   };
 
 
 /** We will make this type abstract */
-type routeConfig 'screenProps 'style =
+type routeConfig 'screenProps =
   Js.t {
     .
-    screen : screenBagJs 'screenProps 'style => ReactRe.reactElement,
+    screen : screenBagJs 'screenProps => ReactRe.reactElement,
     path : Js.Undefined.t string,
     navigationOptions : Js.Undefined.t externalNavigationOptions
   };
 
-type dynamicNavigationOptions 'screenProps 'style =
-  Component.screenBag 'screenProps 'style => navigationOptions 'style;
+type dynamicNavigationOptions 'screenProps = Component.screenBag 'screenProps => navigationOptions;
 
 let routeConfig
-    screen::(screen: Component.screenBag 'screenProps 'style => ReactRe.reactElement)
+    screen::(screen: Component.screenBag 'screenProps => ReactRe.reactElement)
     path::(path: option string)=?
-    navigationOptions::(navigationOptions: option (navigationOptions 'style))=?
+    navigationOptions::(navigationOptions: option navigationOptions)=?
     dynamicNavigationOptions::
-      (dynamicNavigationOptions: option (dynamicNavigationOptions 'screenProps 'style))=?
+      (dynamicNavigationOptions: option (dynamicNavigationOptions 'screenProps))=?
     ()
-    :routeConfig 'screenProps 'style => {
-  "screen": fun (jsItems: screenBagJs 'screenProps 'style) => {
+    :routeConfig 'screenProps => {
+  "screen": fun (jsItems: screenBagJs 'screenProps) => {
     let navigation = jsItems##navigation;
     let screenProps = jsItems##screenProps;
     let navigationOptions =
@@ -244,27 +245,22 @@ let routeConfig
 
 
 /** We will make this type abstract */
-type routesConfig 'screenProps 'style = Js.Dict.t (routeConfig 'screenProps 'style);
+type routesConfig 'screenProps = Js.Dict.t (routeConfig 'screenProps);
 
-let routesConfig
-    (routeList: list (string, routeConfig 'screenProps 'style))
-    :routesConfig 'screenProps 'style =>
+let routesConfig (routeList: list (string, routeConfig 'screenProps)) :routesConfig 'screenProps =>
   Utils.dictFromList routeList;
 
 
 /** Our interface */
 module type StackNavigatorSpec = {
   type screenProps;
-  type style;
-  let routes: routesConfig screenProps style;
-  let config: option (config style);
+  let routes: routesConfig screenProps;
+  let config: option config;
 };
 
 module CreateComponent (Spec: StackNavigatorSpec) => {
   external _createElement :
-    routesConfig Spec.screenProps Spec.style =>
-    Js.Undefined.t (config Spec.style) =>
-    ReactRe.reactClass =
+    routesConfig Spec.screenProps => Js.Undefined.t config => ReactRe.reactClass =
     "StackNavigator" [@@bs.module "react-navigation"];
   let wrapProps (screenProps: Spec.screenProps) =>
     ReactRe.wrapPropsShamelessly

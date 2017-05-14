@@ -1,84 +1,84 @@
 type headerProps;
 
+type style = ReactNative.Style.t;
+
 module Component: {
-  type navigationOptionsRecord 'style = {
+  type navigationOptionsRecord = {
     title: option string,
     header: option (headerProps => ReactRe.reactElement),
     headerVisible: option bool,
     headerTitle: option ReactRe.reactElement,
-    headerTitleStyle: option 'style,
+    headerTitleStyle: option style,
     headerTintColor: option string,
     headerBackTitle: option string,
     headerTruncatedBackTitle: option string,
     headerLeft: option ReactRe.reactElement,
-    headerBackTitleStyle: option 'style,
+    headerBackTitleStyle: option style,
     headerPressColorAndroid: option string,
     headerRight: option ReactRe.reactElement,
-    headerStyle: option 'style,
+    headerStyle: option style,
     gesturesEnabled: option bool
   };
-  type screenBag 'screenProps 'style = {
+  type screenBag 'screenProps = {
     navigation: NavigationRe.t,
     screenProps: 'screenProps,
-    navigationOptions: option (navigationOptionsRecord 'style)
+    navigationOptions: option navigationOptionsRecord
   };
 };
 
-type navigationOptions 'style;
+type navigationOptions;
 
 let navigationOptions:
   title::string? =>
   header::(headerProps => ReactRe.reactElement)? =>
   headerVisible::bool? =>
   headerTitle::ReactRe.reactElement? =>
-  headerTitleStyle::'style? =>
+  headerTitleStyle::style? =>
   headerTintColor::string? =>
   headerBackTitle::string? =>
   headerTruncatedBackTitle::string? =>
   headerLeft::ReactRe.reactElement? =>
-  headerBackTitleStyle::'style? =>
+  headerBackTitleStyle::style? =>
   headerPressColorAndroid::string? =>
   headerRight::ReactRe.reactElement? =>
-  headerStyle::'style? =>
+  headerStyle::style? =>
   gesturesEnabled::bool? =>
   unit =>
-  navigationOptions 'style;
+  navigationOptions;
 
-type config 'style;
+type config;
 
 let config:
   initialRouteName::string? =>
   initialRouteParams::Js.Dict.t string? =>
   paths::Js.Dict.t string? =>
-  navigationOptions::navigationOptions 'style? =>
+  navigationOptions::navigationOptions? =>
   mode::[ | `card | `modal]? =>
   headerMode::[ | `float | `none | `screen]? =>
-  cardStyle::'style? =>
+  cardStyle::style? =>
   onTransitionStart::(unit => unit)? =>
   onTransitionEnd::(unit => unit)? =>
   unit =>
-  config 'style;
+  config;
 
-type routeConfig 'screenProps 'style;
+type routeConfig 'screenProps;
 
 let routeConfig:
-  screen::(Component.screenBag 'screenProps 'style => ReactRe.reactElement) =>
+  screen::(Component.screenBag 'screenProps => ReactRe.reactElement) =>
   path::string? =>
-  navigationOptions::navigationOptions 'style? =>
-  dynamicNavigationOptions::(Component.screenBag 'screenProps 'style => navigationOptions 'style)? =>
+  navigationOptions::navigationOptions? =>
+  dynamicNavigationOptions::(Component.screenBag 'screenProps => navigationOptions)? =>
   unit =>
-  routeConfig 'screenProps 'style;
+  routeConfig 'screenProps;
 
-type routesConfig 'screenProps 'style;
+type routesConfig 'screenProps;
 
-let routesConfig:
-  list (string, routeConfig 'screenProps 'style) => routesConfig 'screenProps 'style;
+let routesConfig: list (string, routeConfig 'screenProps) => routesConfig 'screenProps;
 
 module type StackNavigatorSpec = {
   type screenProps;
-  type style;
-  let routes: routesConfig screenProps style;
-  let config: option (config style);
+  let routes: routesConfig screenProps;
+  let config: option config;
 };
 
 module CreateComponent:
