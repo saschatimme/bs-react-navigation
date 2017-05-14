@@ -62,7 +62,7 @@ let navOptionsFromJs jsItem :Component.navigationOptionsRecord =>
       headerPressColorAndroid: to_opt jsItem##headerPressColorAndroid,
       headerRight: to_opt jsItem##headerRight,
       headerStyle: to_opt jsItem##headerStyle,
-      gesturesEnabled: Utils.option_map Js.to_bool (to_opt jsItem##gesturesEnabled)
+      gesturesEnabled: NavUtils.option_map Js.to_bool (to_opt jsItem##gesturesEnabled)
     }
   );
 
@@ -102,30 +102,40 @@ let navigationOptions
         "headerPressColorAndroid": from_opt headerPressColorAndroid,
         "headerRight": from_opt headerRight,
         "headerStyle": from_opt headerStyle,
-        "gesturesEnabled": from_opt (Utils.option_map Js.Boolean.to_js_boolean gesturesEnabled)
+        "gesturesEnabled": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean gesturesEnabled)
       }
     );
   x
 };
 
 
-/** We will make this type abstract */
-type config =
-  Js.t {
-    .
-    /*router*/
-    initialRouteName : Js.Undefined.t string,
-    initialRouteParams : Js.Dict.t string,
-    paths : Js.Undefined.t (Js.Dict.t string),
-    navigationOptions : Js.Undefined.t navigationOptions,
-    /*view*/
-    mode : Js.Undefined.t string,
-    headerMode : Js.Undefined.t string,
-    cardStyle : Js.Undefined.t style,
-    /*TODO transitionConfig*/
-    onTransitionStart : Js.Undefined.t (unit => unit),
-    onTransitionEnd : Js.Undefined.t (unit => unit)
-  };
+/**
+  *  Problem:
+  *  react-navigation handles { a: undefined} differently
+  *  than { }. Therefore we cannot use the default way with a Js.t object.
+  *  As a solution, we make the type abstract and use `Obj.magic` and a dict.
+  *
+ */
+type config;
+
+/*
+ type config =
+   Js.t {
+     .
+     /*router*/
+     initialRouteName : Js.Undefined.t string,
+     initialRouteParams : Js.Dict.t string,
+     paths : Js.Undefined.t (Js.Dict.t string),
+     navigationOptions : Js.Undefined.t navigationOptions,
+     /*view*/
+     mode : Js.Undefined.t string,
+     headerMode : Js.Undefined.t string,
+     cardStyle : Js.Undefined.t style,
+     /*TODO transitionConfig*/
+     onTransitionStart : Js.Undefined.t (unit => unit),
+     onTransitionEnd : Js.Undefined.t (unit => unit)
+   };*/
+
 
 let config
     ::initialRouteName=?
@@ -138,47 +148,49 @@ let config
     ::onTransitionStart=?
     ::onTransitionEnd=?
     ()
-    :config =>
-  Js.Undefined.(
-    {
-      "initialRouteName": from_opt initialRouteName,
-      "initialRouteParams":
-        switch initialRouteParams {
-        | Some params => params
-        | None => Js.Dict.empty ()
-        },
-      "paths": from_opt paths,
-      "navigationOptions": from_opt navigationOptions,
-      "mode":
-        from_opt (
-          Utils.option_map
-            (
-              fun prop =>
-                switch prop {
-                | `card => "card"
-                | `modal => "modal"
-                }
-            )
-            mode
-        ),
-      "headerMode":
-        from_opt (
-          Utils.option_map
-            (
-              fun prop =>
-                switch prop {
-                | `float => "float"
-                | `screen => "screen"
-                | `none => "none"
-                }
-            )
-            headerMode
-        ),
-      "cardStyle": from_opt cardStyle,
-      "onTransitionStart": from_opt onTransitionStart,
-      "onTransitionEnd": from_opt onTransitionEnd
-    }
-  );
+    :config => {
+  let c = Js.Dict.empty ();
+  NavUtils.setValue c "initialRouteName" initialRouteName;
+  switch initialRouteParams {
+  | None => NavUtils.setValue c "initialRouteParams" (Some (Js.Dict.empty ()))
+  | _ => NavUtils.setValue c "initialRouteParams" initialRouteParams
+  };
+  NavUtils.setValue c "paths" paths;
+  NavUtils.setValue c "navigationOptions" navigationOptions;
+  NavUtils.setValue c "cardStyle" cardStyle;
+  NavUtils.setValue c "onTransitionStart" onTransitionStart;
+  NavUtils.setValue c "onTransitionEnd" onTransitionEnd;
+  NavUtils.setValue
+    c
+    "mode"
+    (
+      NavUtils.option_map
+        (
+          fun prop =>
+            switch prop {
+            | `card => "card"
+            | `modal => "modal"
+            }
+        )
+        mode
+    );
+  NavUtils.setValue
+    c
+    "headerMode"
+    (
+      NavUtils.option_map
+        (
+          fun prop =>
+            switch prop {
+            | `float => "float"
+            | `screen => "screen"
+            | `none => "none"
+            }
+        )
+        headerMode
+    );
+  Obj.magic c
+};
 
 type externalNavigationOptions;
 
@@ -219,7 +231,7 @@ let routeConfig
     let navigation = jsItems##navigation;
     let screenProps = jsItems##screenProps;
     let navigationOptions =
-      Utils.option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions);
+      NavUtils.option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions);
     screen (screenBag navigation screenProps navigationOptions)
   },
   "path": Js.Undefined.from_opt path,
@@ -234,7 +246,7 @@ let routeConfig
                 jsItems##navigation
                 jsItems##screenProps
                 (
-                  Utils.option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions)
+                  NavUtils.option_map navOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions)
                 )
             )
         )
@@ -248,7 +260,7 @@ let routeConfig
 type routesConfig 'screenProps = Js.Dict.t (routeConfig 'screenProps);
 
 let routesConfig (routeList: list (string, routeConfig 'screenProps)) :routesConfig 'screenProps =>
-  Utils.dictFromList routeList;
+  NavUtils.dictFromList routeList;
 
 
 /** Our interface */

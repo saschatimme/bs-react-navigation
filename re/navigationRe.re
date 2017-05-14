@@ -34,7 +34,7 @@ let rec fromJs (js: stateJs) :state => {
     };
   let path = Js.Undefined.to_opt js##path;
   let index = Js.Undefined.to_opt js##index;
-  let routes = Js.Undefined.to_opt js##routes |> Utils.option_map (Array.map fromJs);
+  let routes = Js.Undefined.to_opt js##routes |> NavUtils.option_map (Array.map fromJs);
   {key, routeName, params, path, index, routes}
 };
 

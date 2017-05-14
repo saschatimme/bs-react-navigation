@@ -41,10 +41,10 @@ let navigationOptions
   Js.Undefined.(
     {
       "title": from_opt title,
-      "tabBarVisible": from_opt (Utils.option_map Js.Boolean.to_js_boolean tabBarVisible),
+      "tabBarVisible": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean tabBarVisible),
       "tabBarIcon":
         from_opt (
-          Utils.option_map
+          NavUtils.option_map
             (
               fun p =>
                 switch p {
@@ -58,7 +58,7 @@ let navigationOptions
         ),
       "tabBarLabel":
         from_opt (
-          Utils.option_map
+          NavUtils.option_map
             (
               fun p =>
                 switch p {
@@ -77,7 +77,7 @@ let navigationOptionsFromJs (jsItem: navigationOptions) :Component.navigationOpt
   Component.(
     Js.Undefined.{
       title: to_opt jsItem##title,
-      tabBarVisible: Utils.option_map Js.to_bool (to_opt jsItem##tabBarVisible)
+      tabBarVisible: NavUtils.option_map Js.to_bool (to_opt jsItem##tabBarVisible)
       /** there is no value to provide these values */
       /*tabBarIcon: None,
         tabBarLabel: None*/
@@ -140,14 +140,14 @@ let tabBarOptions
       "activeBackgroundColor": from_opt activeBackgroundColor,
       "inactiveTintColor": from_opt inactiveTintColor,
       "inactiveBackgroundColor": from_opt inactiveBackgroundColor,
-      "showLabel": from_opt (Utils.option_map Js.Boolean.to_js_boolean showLabel),
+      "showLabel": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean showLabel),
       "style": from_opt style,
       "labelStyle": from_opt labelStyle,
-      "showIcon": from_opt (Utils.option_map Js.Boolean.to_js_boolean showIcon),
-      "upperCaseLabel": from_opt (Utils.option_map Js.Boolean.to_js_boolean upperCaseLabel),
-      "pressColor": from_opt (Utils.option_map Js.Boolean.to_js_boolean pressColor),
+      "showIcon": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean showIcon),
+      "upperCaseLabel": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean upperCaseLabel),
+      "pressColor": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean pressColor),
       "pressOpacity": from_opt pressOpacity,
-      "scrollEnabled": from_opt (Utils.option_map Js.Boolean.to_js_boolean scrollEnabled),
+      "scrollEnabled": from_opt (NavUtils.option_map Js.Boolean.to_js_boolean scrollEnabled),
       "tabStyle": from_opt tabStyle,
       "indicatorStyle": from_opt indicatorStyle,
       "iconStyle": from_opt iconStyle
@@ -155,8 +155,16 @@ let tabBarOptions
   );
 
 
-/** We will make this type abstract */
-type config =
+/**
+  *  Problem:
+  *  react-navigation handles { a: undefined} differently
+  *  than { }. Therefore we cannot use the default way with a Js.t object.
+  *  As a solution, we make the type abstract and use `Obj.magic` and a dict.
+  *
+ */
+type config;
+
+/*type config =
   Js.t {
     .
     /*router*/
@@ -171,8 +179,7 @@ type config =
     animationEnabled : Js.Undefined.t Js.boolean,
     _lazy : Js.Undefined.t Js.boolean,
     tabBarOptions : Js.Undefined.t tabBarOptions
-  };
-
+  };*/
 let config
     ::tabBarOptions=?
     ::animationEnabled=?
@@ -185,43 +192,47 @@ let config
     ::paths=?
     ::tabBarComponent=?
     ()
-    :config =>
-  Js.Undefined.(
-    {
-      "initialRouteName": from_opt initialRouteName,
-      "paths": from_opt paths,
-      "tabBarOptions": from_opt tabBarOptions,
-      "order": from_opt order,
-      "_lazy": from_opt (Utils.option_map Js.Boolean.to_js_boolean lazy_),
-      "swipeEnabled": from_opt (Utils.option_map Js.Boolean.to_js_boolean swipeEnabled),
-      "animationEnabled": from_opt (Utils.option_map Js.Boolean.to_js_boolean animationEnabled),
-      "backBehavior":
-        from_opt (
-          Utils.option_map
-            (
-              fun prop =>
-                switch prop {
-                | `none => "none"
-                | `initialRoute => "initialRoute"
-                }
-            )
-            backBehavior
-        ),
-      "tabBarPosition":
-        from_opt (
-          Utils.option_map
-            (
-              fun prop =>
-                switch prop {
-                | `top => "top"
-                | `bottom => "bottom"
-                }
-            )
-            tabBarPosition
-        ),
-      "tabBarComponent": from_opt tabBarComponent
-    }
-  );
+    :config => {
+  let c = Js.Dict.empty ();
+  NavUtils.setValue c "initialRouteName" initialRouteName;
+  NavUtils.setValue c "paths" paths;
+  NavUtils.setValue c "tabBarOptions" tabBarOptions;
+  NavUtils.setValue c "order" order;
+  NavUtils.setValue c "lazy" (NavUtils.option_map Js.Boolean.to_js_boolean lazy_);
+  NavUtils.setValue c "swipeEnabled" (NavUtils.option_map Js.Boolean.to_js_boolean swipeEnabled);
+  NavUtils.setValue
+    c
+    "backBehavior"
+    (
+      NavUtils.option_map
+        (
+          fun prop =>
+            switch prop {
+            | `none => "none"
+            | `initialRoute => "initialRoute"
+            }
+        )
+        backBehavior
+    );
+  NavUtils.setValue
+    c "animationEnabled" (NavUtils.option_map Js.Boolean.to_js_boolean animationEnabled);
+  NavUtils.setValue
+    c
+    "tabBarPosition"
+    (
+      NavUtils.option_map
+        (
+          fun prop =>
+            switch prop {
+            | `top => "top"
+            | `bottom => "bottom"
+            }
+        )
+        tabBarPosition
+    );
+  NavUtils.setValue c "tabBarComponent" tabBarComponent;
+  Obj.magic c
+};
 
 
 /** We will make this type abstract */
@@ -262,7 +273,7 @@ let routeConfig
     let navigation = jsItems##navigation;
     let screenProps = jsItems##screenProps;
     let navigationOptions =
-      Utils.option_map navigationOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions);
+      NavUtils.option_map navigationOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions);
     screen (screenBag navigation screenProps navigationOptions)
   },
   "path": Js.Undefined.from_opt path,
@@ -277,7 +288,7 @@ let routeConfig
                 jsItems##navigation
                 jsItems##screenProps
                 (
-                  Utils.option_map
+                  NavUtils.option_map
                     navigationOptionsFromJs (Js.Undefined.to_opt jsItems##navigationOptions)
                 )
             )
@@ -290,7 +301,7 @@ let routeConfig
 type routesConfig 'screenProps = Js.Dict.t (routeConfig 'screenProps);
 
 let routesConfig (routeList: list (string, routeConfig 'screenProps)) :routesConfig 'screenProps =>
-  Utils.dictFromList routeList;
+  NavUtils.dictFromList routeList;
 
 
 /** Our interface */

@@ -26,7 +26,7 @@ external _reset : Js.t {. index : int, actions : Js.Undefined.t (array t)} => t 
 let reset index::(index: int) actions::(actions: option (list t))=? () :t =>
   _reset {
     "index": index,
-    "actions": Js.Undefined.from_opt (Utils.option_map Array.of_list actions)
+    "actions": Js.Undefined.from_opt (NavUtils.option_map Array.of_list actions)
   };
 
 external _back : Js.t {. key : Js.Null.t string} => t =
