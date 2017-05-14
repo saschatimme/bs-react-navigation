@@ -314,7 +314,7 @@ module type TabNavigatorSpec = {
 module CreateComponent (Spec: TabNavigatorSpec) => {
   external _createElement :
     routesConfig Spec.screenProps => Js.Undefined.t config => ReactRe.reactClass =
-    "StackNavigator" [@@bs.module "react-navigation"];
+    "TabNavigator" [@@bs.module "react-navigation"];
   let wrapProps (screenProps: Spec.screenProps) =>
     ReactRe.wrapPropsShamelessly
       (_createElement Spec.routes (Js.Undefined.from_opt Spec.config))
