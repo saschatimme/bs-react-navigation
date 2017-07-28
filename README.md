@@ -2,7 +2,7 @@
 
 ### Disclaimer
 
-This is **work in progress**.
+This is **work in progress**. Currently only `StackNavigator` works.
 
 ### More React-Native
 
