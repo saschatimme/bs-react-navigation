@@ -1,37 +1,5 @@
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
-function copyFile(src, dest) {
-    let readStream = fs.createReadStream(src);
 
-    readStream.once("error", err => {
-        console.log(err);
-    });
-
-    readStream.once("end", () => {
-        // console.log("done copying");
-    });
-
-    readStream.pipe(fs.createWriteStream(dest));
-}
-
-function copyReactNavigation() {
-    const fileNames = [
-        "navigationActionsRe.re",
-        "reactNavigation.re",
-        "stackNavigatorRe.rei",
-        "tabNavigatorRe.rei",
-        "navigationRe.re",
-        "stackNavigatorRe.re",
-        "tabNavigatorRe.re",
-        "navUtils.re"
-    ];
-
-    fileNames.forEach (name => {
-        copyFile(path.resolve(`../re/${name}`), path.resolve(`./reactNavigation/${name}`));
-
-    }) 
-}
-
-copyReactNavigation();
-
-module.exports.copyFile = copyReactNavigation;
+fs.ensureDirSync(path.join(__dirname, "./react-navigation"));
+fs.copySync(path.join(__dirname, "../re"), path.join(__dirname, "./react-navigation"));
