@@ -1,4 +1,4 @@
-open ReactNative;
+/*open ReactNative;
 
 open ReactNavigation;
 
@@ -142,4 +142,4 @@ module SimpleTab = {
 
 include TabNavigator.CreateComponent SimpleTab; 
 
-let createElement = wrapProps ();
+let createElement = wrapProps ();*/

@@ -4,7 +4,7 @@
  * @flow
  */
 
-import { comp as App } from "./lib/js/re/app.js";
+import { jsComponent as App } from "./lib/js/re/app.js";
 import React from "react";
 import {
   AppRegistry

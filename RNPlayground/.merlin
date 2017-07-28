@@ -1,5 +1,5 @@
 ####{BSB GENERATED: NO EDIT
-FLG -ppx /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-platform/bin/reactjs_jsx_ppx.exe
+FLG -ppx '/Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-platform/bin/reactjs_jsx_ppx_2.exe'
 FLG -ppx /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-platform/bin/bsppx.exe
 S /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-platform/lib/ocaml
 B /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-platform/lib/ocaml
@@ -8,8 +8,8 @@ S /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-
 B /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/bs-react-native/lib/ocaml
 S /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/reason-react/lib/ocaml
 B /Users/sascha/coding/private/bs-react-navigation/RNPlayground/node_modules/reason-react/lib/ocaml
-S reactNavigation
-B lib/bs/reactNavigation
+S react-navigation
+B lib/bs/react-navigation
 S re
 B lib/bs/re
 ####BSB GENERATED: NO EDIT}

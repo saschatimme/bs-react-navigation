@@ -10,14 +10,15 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "react": "^15.5.4"
+    "react": "^15.5.4",
+    "react-native": "^0.46.0"
   },
   "dependencies": {
     "react-navigation": "^1.0.0-beta.9",
-    "reason-react": "^0.1.3",
+    "reason-react": "^0.2.3",
     "bs-react-native": "https://github.com/BuckleTypes/bs-react-native"
   },
   "devDependencies": {
-    "bs-platform": "^1.7.3"
+    "bs-platform": "^1.8.0"
   }
 }

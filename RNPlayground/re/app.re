@@ -1,12 +1,5 @@
-module App = {
-  include ReactRe.Component.JsProps;
-  let name = "App";
-  type props = unit;
-  type jsProps = option (unit => unit);
-  let jsPropsToReasonProps = Some (fun _ => ());
-  let render _ => <AppNavigator />;
-};
- 
-include ReactRe.CreateComponent App;
+let component = ReasonReact.statelessComponent "App";
 
-let createElement = wrapProps ();
+let make _children => {...component, render: fun _ => <AppNavigator />};
+
+let jsComponent = ReasonReact.wrapReasonForJs ::component (fun _ => make [||]);
